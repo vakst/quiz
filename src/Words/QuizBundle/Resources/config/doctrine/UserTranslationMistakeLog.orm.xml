@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="utf-8"?>
+<doctrine-mapping xmlns="http://doctrine-project.org/schemas/orm/doctrine-mapping" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://doctrine-project.org/schemas/orm/doctrine-mapping http://doctrine-project.org/schemas/orm/doctrine-mapping.xsd">
+  <entity name="Words\QuizBundle\Entity\UserTranslationMistakeLog" table="user_translation_mistake_log" repository-class="Words\QuizBundle\Entity\UserTranslationMistakeLogRepository">
+    <indexes>
+      <index name="IDX_E3FE2895E357438D" columns="word_id"/>
+      <index name="IDX_E3FE28959CAA2B25" columns="translation_id"/>
+      <index name="IDX_E3FE2895A76ED395" columns="user_id"/>
+    </indexes>
+    <unique-constraints>
+      <unique-constraint name="UNIQ_USER_MISTAKE" columns="word_id,translation_id,user_id"/>
+      <unique-constraint name="I_USER_TRANSLATION_MISTAKE_LOG_UNIQUE" columns="word_id,translation_id,user_id"/>
+    </unique-constraints>
+    <id name="id" type="integer" column="id">
+      <generator strategy="SEQUENCE"/>
+      <sequence-generator sequence-name="user_translation_mistake_log_id_seq" allocation-size="1" initial-value="1"/>
+    </id>
+    <field name="createdDate" type="datetimetz" column="created_date" nullable="false">
+      <options>
+        <option name="default">now()</option>
+      </options>
+    </field>
+    <many-to-one field="user" target-entity="User" fetch="LAZY">
+      <join-columns>
+        <join-column name="user_id" referenced-column-name="id"/>
+      </join-columns>
+    </many-to-one>
+    <many-to-one field="translation" target-entity="Word" fetch="LAZY">
+      <join-columns>
+        <join-column name="translation_id" referenced-column-name="id"/>
+      </join-columns>
+    </many-to-one>
+    <many-to-one field="word" target-entity="Word" fetch="LAZY">
+      <join-columns>
+        <join-column name="word_id" referenced-column-name="id"/>
+      </join-columns>
+    </many-to-one>
+  </entity>
+</doctrine-mapping>

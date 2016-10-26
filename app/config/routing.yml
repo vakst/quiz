@@ -1,0 +1,3 @@
+words_quiz:
+    resource: "@WordsQuizBundle/Resources/config/routing.yml"
+    prefix:   /

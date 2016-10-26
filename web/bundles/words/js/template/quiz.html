@@ -1,0 +1,19 @@
+
+<div ng-controller="quizCtrl" data-ng-init="init()" >
+	<div ng-show="isProcessing" class="loader">
+	  <i></i><i></i><i></i><i></i><i></i>
+	</div>
+	<div ng-hide="isProcessing">
+	<div>Выберите правильный перевод для слова {{word}}</div>
+	<div>Список ответов:</div>
+	<form ng-submit="answerQuestion(quiz)">
+		<div ng-repeat="translation in translationList">
+		  <input type="radio" name="answer" value="{{translation.id}}" ng-model="quiz.answer" ng-disabled="isProcessing" ng-required="true"><span>{{translation.name}}</span>
+		</div>
+		<div><button type="submit" ng-disabled="isProcessing">Ответить</button></div>
+	</form>
+	</div>
+
+	<div><a href="#/logout" ng-click="logout()">Выйти</div>
+	
+</div>

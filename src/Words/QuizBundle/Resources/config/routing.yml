@@ -1,0 +1,21 @@
+words_quiz_homepage:
+    path:     /
+    defaults: { _controller: WordsQuizBundle:Quiz:index }
+words_quiz_get_question:
+    path:     /api/getQuestion
+    defaults: { _controller: WordsQuizBundle:Quiz:getQuestion }
+words_quiz_answer_question:
+    path:     /api/answerQuestion
+    defaults: { _controller: WordsQuizBundle:Quiz:answerQuestion }
+words_quiz_get_result:
+    path:     /api/getQuizResult
+    defaults: { _controller: WordsQuizBundle:Quiz:getResult }
+words_quiz_is_logged:
+    path:     /api/isLogged
+    defaults: { _controller: WordsQuizBundle:Authorization:isLogged }
+words_quiz_is_logout:
+    path:     /api/logOut
+    defaults: { _controller: WordsQuizBundle:Authorization:logOut } 
+words_quiz_is_login:
+    path:     /api/logIn
+    defaults: { _controller: WordsQuizBundle:Authorization:logIn }  

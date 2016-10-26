@@ -1,0 +1,185 @@
+CREATE TABLE language
+(
+  id serial NOT NULL,
+  name character varying(32) NOT NULL,
+  code character varying(8) NOT NULL,
+  CONSTRAINT PK_LANGUAGE_ID PRIMARY KEY (id)
+)
+WITH (
+  OIDS=FALSE
+);
+ALTER TABLE language
+  OWNER TO words;
+COMMENT ON TABLE language
+  IS 'Languages of words';
+COMMENT ON COLUMN language.name IS 'language name';
+COMMENT ON COLUMN language.code IS 'code of language';
+
+CREATE INDEX "I_LANGUAGE_CODE"
+  ON language
+  USING hash
+  (code COLLATE pg_catalog."default");
+  
+  
+CREATE TABLE word
+(
+  id serial NOT NULL,
+  name character varying(128) NOT NULL,
+  language_id integer NOT NULL,
+  CONSTRAINT PK_WORK_ID PRIMARY KEY (id),
+  CONSTRAINT "FK_WORD_REF_LANGUAGE_ID" FOREIGN KEY (language_id)
+      REFERENCES language (id) MATCH SIMPLE
+      ON UPDATE CASCADE ON DELETE RESTRICT
+)
+WITH (
+  OIDS=FALSE
+);
+ALTER TABLE word
+  OWNER TO words;
+COMMENT ON TABLE word
+  IS 'List of words';
+COMMENT ON COLUMN language.name IS 'word title';
+
+CREATE INDEX "I_WORD_LANGUAGE_ID"
+  ON word
+  USING btree
+  (language_id);
+  
+  
+CREATE TABLE translation
+(
+  id serial NOT NULL,
+  word_id integer NOT NULL,
+  translation_id integer NOT NULL,
+  CONSTRAINT PK_TRANSLATION_ID PRIMARY KEY (id),
+  CONSTRAINT "FK_TRANSLATION_REF_WORD_WORD_ID" FOREIGN KEY (word_id)
+      REFERENCES word (id) MATCH SIMPLE
+      ON UPDATE CASCADE ON DELETE RESTRICT,
+  CONSTRAINT "FK_TRANSLATION_REF_WORD_TRANSLATION_ID" FOREIGN KEY (translation_id)
+      REFERENCES word (id) MATCH SIMPLE
+      ON UPDATE CASCADE ON DELETE RESTRICT
+)
+WITH (
+  OIDS=FALSE
+);
+ALTER TABLE translation
+  OWNER TO words;
+COMMENT ON TABLE translation
+  IS 'Words translations';
+
+CREATE INDEX "I_TRANSLATION_WORD_ID"
+  ON translation
+  USING btree
+  (word_id);
+  
+CREATE INDEX "I_TRANSLATION_TRANSLATION_ID"
+  ON translation
+  USING btree
+  (translation_id);
+  
+
+  
+  
+CREATE TABLE "user"
+(
+  id serial NOT NULL,
+  name character varying(128) NOT NULL,
+  score integer NOT NULL DEFAULT 0,
+  current_question_offset integer NOT NULL DEFAULT 0,
+  created_date timestamp with time zone NOT NULL DEFAULT now(),
+  CONSTRAINT PK_USER_ID PRIMARY KEY (id)
+)
+WITH (
+  OIDS=FALSE
+); 
+  
+ALTER TABLE "user"
+  OWNER TO words;
+COMMENT ON TABLE "user"
+  IS 'Participants information'; 
+  
+COMMENT ON COLUMN "user".name IS 'user name (from singIn page)';
+COMMENT ON COLUMN "user".score IS 'total user score';
+  
+CREATE TABLE user_translation_mistake_log
+(
+  id serial NOT NULL,
+  word_id integer NOT NULL,
+  translation_id integer NOT NULL,
+  user_id integer NOT NULL,
+  created_date timestamp with time zone NOT NULL DEFAULT now(),
+  CONSTRAINT PK_USER_TRANSLATION_MISTAKE_LOG_ID PRIMARY KEY (id),
+  CONSTRAINT "UNIQ_USER_MISTAKE" UNIQUE (word_id,translation_id,user_id),
+  CONSTRAINT "FK_USER_TRANSLATION_MISTAKE_LOG_REF_WORD_WORD_ID" FOREIGN KEY (word_id)
+      REFERENCES word (id) MATCH SIMPLE
+      ON UPDATE CASCADE ON DELETE RESTRICT,
+  CONSTRAINT "FK_USER_TRANSLATION_MISTAKE_LOG_REF_WORD_TRANSLATION_ID" FOREIGN KEY (translation_id)
+      REFERENCES word (id) MATCH SIMPLE
+      ON UPDATE CASCADE ON DELETE RESTRICT,
+  CONSTRAINT "FK_USER_TRANSLATION_MISTAKE_LOG_REF_USER_ID" FOREIGN KEY (user_id)
+      REFERENCES "user" (id) MATCH SIMPLE
+      ON UPDATE CASCADE ON DELETE RESTRICT
+)
+WITH (
+  OIDS=FALSE
+);
+ALTER TABLE user_translation_mistake_log
+  OWNER TO words;
+COMMENT ON TABLE user_translation_mistake_log
+  IS 'Translation mistake log';
+
+  
+CREATE UNIQUE INDEX "I_USER_TRANSLATION_MISTAKE_LOG_UNIQUE" ON user_translation_mistake_log (word_id,translation_id,user_id);
+  
+  
+INSERT INTO language (name, code)
+    VALUES ('Russian', 'ru');
+INSERT INTO language (name, code)
+    VALUES ('English', 'en');
+  
+CREATE OR REPLACE FUNCTION pseudoRandByParam(int, int) RETURNS int 
+LANGUAGE sql 
+AS
+$$
+    SELECT ($2 *$1 + 21) % 67;
+$$;
+
+
+CREATE or replace FUNCTION addTranslation(eng_word text, ru_word text) RETURNS void AS $$
+  DECLARE    
+    lang_en_id int;
+    lang_ru_id int;
+  en_word_id int;
+  ru_word_id int;
+    BEGIN
+    select id into lang_en_id from language where code='en';
+    select id into lang_ru_id from language where code='ru';
+    
+        INSERT INTO word(name,language_id) VALUES(eng_word, lang_en_id) RETURNING id INTO en_word_id;
+    INSERT INTO word(name,language_id) VALUES(ru_word, lang_ru_id) RETURNING id INTO ru_word_id;
+    
+    INSERT INTO translation(word_id, translation_id) VALUES(en_word_id,ru_word_id);
+    INSERT INTO translation(word_id, translation_id) VALUES(ru_word_id, en_word_id);
+    
+    END;
+$$ LANGUAGE plpgsql;
+
+
+SELECT addTranslation('apple', 'яблоко');
+SELECT addTranslation('pear', 'персик');
+SELECT addTranslation('orange', 'апельсин');
+SELECT addTranslation('grape', 'виноград');
+SELECT addTranslation('lemon', 'лимон');
+SELECT addTranslation('pineapple', 'ананас');
+SELECT addTranslation('watermelon', 'арбуз');
+SELECT addTranslation('coconut', 'кокос');
+SELECT addTranslation('banana', 'банан');
+SELECT addTranslation('pomelo', 'помело');
+SELECT addTranslation('strawberry', 'клубника');
+SELECT addTranslation('raspberry', 'малина');
+SELECT addTranslation('melon', 'дыня');
+SELECT addTranslation('apricot', 'абрикос');
+SELECT addTranslation('mango', 'манго');
+SELECT addTranslation('plum', 'слива');
+SELECT addTranslation('pomegranate', 'гранат');
+SELECT addTranslation('cherry', 'вишня');

@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html ng-app="wordsApp">
+    <head>
+        <meta charset="UTF-8" />
+        <title>{% block title %}Welcome!{% endblock %}</title>
+        <link rel="stylesheet" href="/bundles/words/css/main.css" />
+        <link rel="icon" type="image/x-icon" href="{{ asset('favicon.ico') }}" />
+        <link href="/assets/vendor/AngularJS-Toaster/toaster.min.css" rel="stylesheet">
+		<script src="/assets/vendor/angular/angular.js"></script>
+        <script src="/assets/vendor/angular-route/angular-route.js"></script>
+        <script src="/assets/vendor/AngularJS-Toaster/toaster.js"></script>
+        <script src="/bundles/words/js/app.js"></script>
+    </head>
+    <body>
+        <div class="ngwrapper">
+            <div ng-view></div>
+            <div><toaster-container toaster-options="{'time-out': 3000}"></toaster-container></div>
+        <div>
+    </body>
+</html>
